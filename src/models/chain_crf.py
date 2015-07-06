@@ -75,7 +75,7 @@ def function_creator(name, obs_feat_idx):
 
 
 # Create the unary functions:
-def create_unaries(sentence_data):
+def create_unaries(sentence_data, gm):
     numVar = len(sentence_data)
 
     # Go over the length of the sentence:
@@ -87,10 +87,16 @@ def create_unaries(sentence_data):
         # Create the name of the function
         f_name = 'f_'+str(idx)
         f_name = function_creator(f_name, obs_feat_idx)
-        print f_name(y_tag)
 
-
-
+        # Add the function as a factor to the pgm:
+        py_func = opengm.PythonFunction(f_name,[2])
+        gm_func = gm.addFunction(py_func)
+        gm.addFactor(gm_func,idx)
+        # gm.addFactor(opengm.PythonFunction(f_name,[2]),idx)
+        # gm.addFactor(gm.addFunction(f_name),idx)
+        # exit()
+        # print f_name(y_tag)
+        return 'hey','hou'
 
 # Instantiate the current sentence's gm:
 def instantiate_sentence(sentence_data):
@@ -100,9 +106,12 @@ def instantiate_sentence(sentence_data):
     # Binary variables: [2]
     gm=opengm.gm([2*numVar,numVar])
 
-    # Use observations as unary factors:
-    pf=opengm.PythonFunction(unary_obs,[2,2])
-    print pf
+    # Create the unary factors for the pgm
+    gm, factor_list = create_unaries(sentence_data, gm)
+
+    # # Use observations as unary factors:
+    # pf=opengm.PythonFunction(unary_obs,[2,2])
+    # print pf
 
 # Train the model's parameters:
 def train(templated_data):
@@ -119,8 +128,9 @@ def train(templated_data):
         # num_tokens = len(templated_data[sent_id])
         # print num_tokens
         # Build the graphical model:
-        # gm = instantiate_sentence(templated_data[sent_id])
-        create_unaries(templated_data[sent_id])
+        gm = instantiate_sentence(templated_data[sent_id])
+        # create_unaries(templated_data[sent_id], gm)
+        exit()
 
         # Keep track of the token counter:
         # token_counter += num_tokens
