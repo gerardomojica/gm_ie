@@ -59,6 +59,8 @@ def readiter(fi, names, sep=' '):
             X = []
         else:
             fields = line.split(sep)
+            # print fields
+            # continue
             if len(fields) < len(names):
                 raise ValueError(
                     'Too few fields (%d) for %r\n%s' % (len(fields), names, line))
@@ -179,43 +181,27 @@ attributes, this utility tags the input data when a model file is specified by
             fo.write('\n')
 
 # Luis:
-def get_features(feature_extractor, fields='w pos y', sep=' '):
-    fi = sys.stdin
-    fo = sys.stdout
+def get_features(feature_extractor, fields='w pos y', sep=' ', fi=None):
 
-    # Parse the command-line arguments.
-    parser = optparse.OptionParser(usage="""usage: %prog [options]
-This utility reads a data set from STDIN, and outputs attributes to STDOUT.
-Each line of a data set must consist of field values separated by SEPARATOR
-characters. The names and order of field values can be specified by -f option.
-The separator character can be specified with -s option. Instead of outputting
-attributes, this utility tags the input data when a model file is specified by
--t option (CRFsuite Python module must be installed)."""
-        )
-    parser.add_option(
-        '-t', dest='model',
-        help='tag the input using the model (requires "crfsuite" module)'
-        )
-    parser.add_option(
-        '-f', dest='fields', default=fields,
-        help='specify field names of input data [default: "%default"]'
-        )
-    parser.add_option(
-        '-s', dest='separator', default=sep,
-        help='specify the separator of columns of input data [default: "%default"]'
-        )
-    (options, args) = parser.parse_args()
+    if not fi:
+        fi = sys.stdin
+        fo = sys.stdout
 
-    # The fields of input: ('w', 'pos', 'y) by default.
-    F = options.fields.split(' ')
+    # Get the fields
+    F = fields.split(' ')
 
     X_list = []
-    if not options.model:
-        # The generator function readiter() reads a sequence from a 
-        for X in readiter(fi, F, options.separator):
-            feature_extractor(X)
-            # output_features(fo, X, 'y')
-            X_list.append(X)
+    # The generator function readiter() reads a sequence from a 
+    for X in readiter(fi, F, sep):
+        # print fi, F, sep
+        # print X[0]
+        # exit()
+        feature_extractor(X)
+        # print X[0]
+        # print 'jonas'
+        # exit()
+        # output_features(fo, X, 'y')
+        X_list.append(X)
 
-        return X_list
+    return X_list
 

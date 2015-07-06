@@ -53,7 +53,6 @@ def readiter(fi, names, sep=' '):
     """
     X = []
     for line in fi:
-        # print line.strip()
         line = line.strip('\n')
         if not line:
             yield X
@@ -94,6 +93,9 @@ def output_features(fo, X, field=''):
     """
     for t in range(len(X)):
         if field:
+            # print X[t][field]
+            # print X[t]
+            # exit()
             fo.write('%s' % X[t][field])
         for a in X[t]['F']:
             if isinstance(a, str):
@@ -158,10 +160,13 @@ attributes, this utility tags the input data when a model file is specified by
     if not options.model:
         # The generator function readiter() reads a sequence from a 
         for X in readiter(fi, F, options.separator):
-            # print X
+            # print fi, F, sep
+            # print X[0]
+            # exit()
             feature_extractor(X)
-            # print X[1]['F']
-            # print X
+            # print X[0]
+            # print 'jonas'
+            # exit()
             output_features(fo, X, 'y')
 
     else:
@@ -181,64 +186,3 @@ attributes, this utility tags the input data when a model file is specified by
                 fo.write('\t'.join([v[f] for f in F]))
                 fo.write('\t%s\n' % yseq[t])
             fo.write('\n')
-
-
-# Luis:
-
-def get_features(feature_extractor, fields='w pos y', sep=' '):
-    fi = sys.stdin
-    fo = sys.stdout
-
-    # Parse the command-line arguments.
-    parser = optparse.OptionParser(usage="""usage: %prog [options]
-This utility reads a data set from STDIN, and outputs attributes to STDOUT.
-Each line of a data set must consist of field values separated by SEPARATOR
-characters. The names and order of field values can be specified by -f option.
-The separator character can be specified with -s option. Instead of outputting
-attributes, this utility tags the input data when a model file is specified by
--t option (CRFsuite Python module must be installed)."""
-        )
-    parser.add_option(
-        '-t', dest='model',
-        help='tag the input using the model (requires "crfsuite" module)'
-        )
-    parser.add_option(
-        '-f', dest='fields', default=fields,
-        help='specify field names of input data [default: "%default"]'
-        )
-    parser.add_option(
-        '-s', dest='separator', default=sep,
-        help='specify the separator of columns of input data [default: "%default"]'
-        )
-    (options, args) = parser.parse_args()
-
-    # The fields of input: ('w', 'pos', 'y) by default.
-    F = options.fields.split(' ')
-
-    if not options.model:
-        # The generator function readiter() reads a sequence from a 
-        for X in readiter(fi, F, options.separator):
-            feature_extractor(X)
-            for x in X:
-                print x
-
-    return X
-
-
-    # else:
-    #     # Create a tagger with an existing model.
-    #     import crfsuite
-    #     tagger = crfsuite.Tagger()
-    #     tagger.open(options.model)
-
-    #     # For each sequence from STDIN.
-    #     for X in readiter(fi, F, options.separator):
-    #         # Obtain features.
-    #         feature_extractor(X)
-    #         xseq = to_crfsuite(X)
-    #         yseq = tagger.tag(xseq)
-    #         for t in range(len(X)):
-    #             v = X[t]
-    #             fo.write('\t'.join([v[f] for f in F]))
-    #             fo.write('\t%s\n' % yseq[t])
-    #         fo.write('\n')

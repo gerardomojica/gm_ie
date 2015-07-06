@@ -46,13 +46,30 @@ def feature_extractor(X):
         X[0]['F'].append('__BOS__')     # BOS feature
         X[-1]['F'].append('__EOS__')    # EOS feature
 
+# Open the file and featurize it:
+def featurize_file(filename):
+    # Create the file handler:
+    fi_handler = open(filename, 'r')
+
+    # # Apply the hashing trick
+    # hf = FeatureHasher(input_type='string',non_negative=True)
+
+    X = crfutils.get_features(feature_extractor, fields=fields, sep=' ', fi=fi_handler)
+    # X = crfutils.get_features(feature_extractor, fields=fields, sep=separator)
+    # doc = []
+    # for x in X:
+    #     for entry in x:
+    #         doc.append(entry['F'])
+    # return X, hf.transform(doc)
+    return X
+
+
 if __name__ == '__main__':
     # pass
     # crfutils.main(feature_extractor, fields=fields, sep=separator)
     X = crfutils.get_features(feature_extractor, fields=fields, sep=separator)
 
-    corpus_hv = HashingVectorizer()
-    sg_tv = HashingVectorizer()
+    # Apply the hashing trick
     hf = FeatureHasher(input_type='string',non_negative=True)
     # # List of dictionaries:
     # x_set = set()

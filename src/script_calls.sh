@@ -10,6 +10,9 @@
 
 # Use the original tools from crf_suite on the conll task
 cat ../corpus/train.txt | template/chunking.py > ../corpus/train.crfsuite.txt
+# debug, dont use:
+cd delete
+cat ../../corpus/train.txt | chunking.py
 
 cat ../corpus/crf_suite_conll.txt | template/chunking.py > ../corpus/train.crfsuite.txt
 
@@ -24,4 +27,12 @@ python template/hashing_vs_dict_vectorizer.py
 # ############################# Integrate the hashing trick and build a linear chain crf:
 
 # Note that I'm calling the file as module
-python -m models.chain_crf jonas
+python -m models.chain_crf --train_file ../corpus/train.txt
+# On the sample file:
+python -m models.chain_crf --train_file ../corpus/crf_suite_conll.txt
+
+# ############################# 
+# ############################# 
+# ############################# Testing the creation of dynamic functions:
+
+python -m delete.dynamic_functions
