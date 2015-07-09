@@ -30,6 +30,8 @@ python template/hashing_vs_dict_vectorizer.py
 python -m models.chain_crf --train_file ../corpus/train.txt
 # On the sample file:
 python -m models.chain_crf --train_file ../corpus/crf_suite_conll.txt
+# On a super small traning file, 2 sentences:
+python -m models.chain_crf --train_file ../corpus/dummy_train.txt
 
 # ############################# 
 # ############################# 

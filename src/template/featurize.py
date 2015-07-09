@@ -18,16 +18,16 @@ fields = 'w pos y'
 # Attribute templates.
 templates = (
     # (('w', -2), ),
-    (('w', -1), ),
+    # (('w', -1), ),
     (('w',  0), ),
-    (('w',  1), ),
+    # (('w',  1), ),
     # (('w',  2), ),
     # (('w', -1), ('w',  0)),
     # (('w',  0), ('w',  1)),
     # (('pos', -2), ),
-    (('pos', -1), ),
+    # (('pos', -1), ),
     # (('pos',  0), ),
-    (('pos',  1), ),
+    # (('pos',  1), ),
     # (('pos',  2), ),
     # (('pos', -2), ('pos', -1)),
     # (('pos', -1), ('pos',  0)),
@@ -41,10 +41,10 @@ templates = (
 def feature_extractor(X):
     # Apply attribute templates to obtain features (in fact, attributes)
     crfutils.apply_templates(X, templates)
-    if X:
-	# Append BOS and EOS features manually
-        X[0]['F'].append('__BOS__')     # BOS feature
-        X[-1]['F'].append('__EOS__')    # EOS feature
+ #    if X:
+	# # Append BOS and EOS features manually
+ #        X[0]['F'].append('__BOS__')     # BOS feature
+ #        X[-1]['F'].append('__EOS__')    # EOS feature
 
 # Open the file and featurize it:
 def featurize_file(filename):
@@ -57,11 +57,13 @@ def featurize_file(filename):
     X = crfutils.get_features(feature_extractor, fields=fields, sep=' ', fi=fi_handler)
     # X = crfutils.get_features(feature_extractor, fields=fields, sep=separator)
     # doc = []
-    # for x in X:
-    #     for entry in x:
-    #         doc.append(entry['F'])
+    Y = set()
+    for x in X:
+        for entry in x:
+            Y.add(entry['y'])
+            # doc.append(entry['F'])
     # return X, hf.transform(doc)
-    return X
+    return X, list(Y)
 
 
 if __name__ == '__main__':
