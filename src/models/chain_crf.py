@@ -77,7 +77,10 @@ def function_creator(name, obs_feat_idx):
         # print fv, [feat_list]
         # print
         # print fv.dot(w_vec).toarray().item(0)
-        return fv.dot(w_vec).toarray().item(0)
+        # Non-log-linear
+        # return fv.dot(w_vec).toarray().item(0)
+        # Log-linear = exp(∑fv)
+        return math.exp(fv.dot(w_vec).toarray().item(0))
         
         # exit()
 
@@ -87,7 +90,7 @@ def function_creator(name, obs_feat_idx):
 
 
 # Create the unary functions:
-def create_unaries(sentence_data, gm):
+def create_unaries(gm, sentence_data):
     numVar = len(sentence_data)
 
     # List of factors:
@@ -126,29 +129,52 @@ def instantiate_sentence(sentence_data):
     # print 'numVar', numVar
 
     # The domain of the variables is the len of th y_list
+    # Use the multiplier, the adder doesn't seem to work
     gm=opengm.gm([len(y_list)]*numVar,'multiplier')
     # gm=opengm.gm([len(y_list)]*numVar,'adder')
     # print gm.numberOfVariables
     # exit()
 
     # Create the unary factors for the pgm
-    gm = create_unaries(sentence_data, gm)
+    gm = create_unaries(gm, sentence_data)
     # print gm.factors()
     # for fac in gm.factors():
-    #     print fac
+    #     print fac   
 
+    return gm 
     
-    bp = opengm.inference.BeliefPropagation(gm)
-    bp.infer()
-    arg = bp.arg()
-    print arg
+# Compute the gradient for the current training sentence
+def gradient(gm, sentence_data):
+    numVar = len(sentence_data)
 
-    # bp = opengm.inference.BeliefPropagation(gm, 'integrator')
-    # marg = bp.marginals([0,1,2,3])
-    # print marg
+    # Transform to lil:
+    global w_vec
+    w_vec = w_vec.tolil()
     
-    
+    # Go over the length of the sentence:
+    for idx in xrange(numVar):
 
+        # obs_feat_idx = sentence_data[idx]['F']
+        obs_feat_idx = sentence_data[idx]
+        y_tag = obs_feat_idx['y']
+
+        # Get the label string from the input name vector idx
+        label = y_tag
+        
+        # feature list:
+        feat_list = []
+
+        # Add the tag to every feature:
+        for f_val in obs_feat_idx['F']:
+            feat_list.append(label+'~'+f_val)
+
+        # Get the features idxs corresponding to the observations and y, f(x,y)
+        fv = fh.transform([feat_list])
+        rows,cols = fv.nonzero()
+
+        # Go over each of these indices in the weights vector:
+        for w_idx in cols:
+            w_vec[w_idx] = 0.1
 
 # Train the model's parameters:
 def train(templated_data):
@@ -167,7 +193,23 @@ def train(templated_data):
         # Build the graphical model:
         gm = instantiate_sentence(templated_data[sent_id])
         # create_unaries(templated_data[sent_id], gm)
+
+        # # Run inference:
+        # # The MAP
+        bp = opengm.inference.BeliefPropagation(gm, 'integrator')
+        bp.infer()
+        marg = bp.marginals([0,1,2,3])
+        print marg
+        # arg = bp.arg()
+        # print arg
+        gradient(gm, templated_data[sent_id])
         exit()
+
+        # Here the marginals
+        # bp = opengm.inference.BeliefPropagation(gm, 'integrator')
+        # marg = bp.marginals([0,1,2,3])
+        # print marg
+
 
         # Keep track of the token counter:
         # token_counter += num_tokens
@@ -197,11 +239,11 @@ def main(argv):
     # w_vec = lil_matrix((1,n_features))
     # w_vec = np.ones((1,n_features))
     # w_vec = np.full((1,n_features),0.1)
-    w_vec = np.full((1,n_features),0)
-    w_vec[0,13] = 1
-    w_vec[0,18] = 1
-    w_vec[0,7] = 1
-    w_vec[0,11] = 1
+    w_vec = np.zeros((1,n_features))
+    # w_vec[0,13] = 1
+    # w_vec[0,18] = 1
+    # w_vec[0,7] = 1
+    # w_vec[0,11] = 1
     # print w_vec
     # w_vec[0,100]=45
     # w_vec = sparse.csr_matrix(w_vec)
