@@ -88,6 +88,38 @@ def function_creator(name, obs_feat_idx):
     foo.__name__ = name
     return foo
 
+# Get the list of features associated with a sample:
+def sample_features(name, obs_feat_idx):
+    
+    def foo(label_idx):
+        
+        # Get the label string from the input name vector idx
+        label = y_list[label_idx[0]]
+        
+        # feature list:
+        feat_list = []
+
+        # Add the tag to every feature:
+        for f_val in obs_feat_idx['F']:
+            feat_list.append(label+'~'+f_val)
+
+        fv = fh.transform([feat_list])
+        
+        # Compute the dot product with the weights vector:
+        # print fv, [feat_list]
+        # print
+        # print fv.dot(w_vec).toarray().item(0)
+        # Non-log-linear
+        # return fv.dot(w_vec).toarray().item(0)
+        # Log-linear = exp(∑fv)
+        return math.exp(fv.dot(w_vec).toarray().item(0))
+        
+        # exit()
+
+    # Give a name to the function
+    foo.__name__ = name
+    return foo
+
 
 # Create the unary functions:
 def create_unaries(gm, sentence_data):
@@ -116,11 +148,19 @@ def create_unaries(gm, sentence_data):
         # for c in opengm.shapeWalker(py_func.shape):
         #     print c," ",py_func[c]
 
+        # Get the feature list for this variable (clique):
+        feat_list = []
+        # Add the tag to every feature:
+        for f_val in obs_feat_idx['F']:
+            feat_list.append(y_tag+'~'+f_val)
+
+        fv = fh.transform([feat_list])
+        print fv.nonzero()[1][0]
 
         # exit()
         # print f_name(y_tag)
         # exit()
-    return gm
+    return gm, None
 
 # Instantiate the current sentence's gm:
 def instantiate_sentence(sentence_data):
@@ -136,7 +176,7 @@ def instantiate_sentence(sentence_data):
     # exit()
 
     # Create the unary factors for the pgm
-    gm = create_unaries(gm, sentence_data)
+    gm, feat_idxs = create_unaries(gm, sentence_data)
     # print gm.factors()
     # for fac in gm.factors():
     #     print fac   
@@ -215,6 +255,49 @@ def train(templated_data):
         # token_counter += num_tokens
         # print 'aqui'
 
+# Implement stochatic gradient descent for general conditional models:
+def SGD(max_iter, templated_data):
+    # Initialize weights:
+    # Initialize the sparse weights vector:
+    global w_vec
+    w_vec = np.zeros((1,n_features))
+
+    # Iterate up to max_iter:
+    for x in xrange(max_iter):
+
+        # Define learning rate based on the current iteration:
+        # Not for now:
+        eta = 0.5
+
+        # Go over each of the training samples:
+        for m in templated_data:
+
+            # Instantialte the graphical model:
+            m_sample = instantiate_sentence(m)
+            print m_sample
+            exit()
+
+        # exit()
+
+        #     # Get features used in m:
+        #     m_features = []
+
+        #     # Go over each of the features used in m:
+        #     for i in m_features:
+
+        #         # Get the current weight_i:
+        #         w_i = w_vec[i]
+
+        #         # # Compute the gradient from this sample m:
+        #         # g = 
+
+        #         # Update weight:
+        #         # w_i += eta*(g)
+
+        #         # Store the new w_i:
+        #         # w_vec[i] = w_i
+
+
 def main(argv):
     options, remainder = getopt.getopt(argv, 'o:v', ['train_file=',])
 
@@ -259,7 +342,10 @@ def main(argv):
 
     # Train:
     # train(templated_data, hashed_feature_matrix)
-    train(templated_data)
+    # train(templated_data)
+
+    # Train using the SGD:
+    SGD(5, templated_data)
 
 
 if __name__ == '__main__':
