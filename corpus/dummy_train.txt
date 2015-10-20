@@ -1,0 +1,9 @@
+The DT O
+dog NN I
+is VB O
+nuts JJ O
+
+She NN I
+eats VB O
+nuts NN I
+

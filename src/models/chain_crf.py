@@ -228,7 +228,7 @@ def train(templated_data):
     # Go over each of the sentences and build the modle:
     for sent_id, sentence in enumerate(templated_data):
         # Get the number of tokens:
-        # num_tokens = len(templated_data[sent_id])
+        num_tokens = len(templated_data[sent_id])
         # print num_tokens
         # Build the graphical model:
         gm = instantiate_sentence(templated_data[sent_id])
@@ -239,7 +239,7 @@ def train(templated_data):
         bp = opengm.inference.BeliefPropagation(gm, 'integrator')
         bp.infer()
         marg = bp.marginals([0,1,2,3])
-        print marg
+        print 'marg',marg
         # arg = bp.arg()
         # print arg
         gradient(gm, templated_data[sent_id])
@@ -275,6 +275,10 @@ def SGD(max_iter, templated_data):
             # Instantialte the graphical model:
             m_sample = instantiate_sentence(m)
             print m_sample
+            bp = opengm.inference.BeliefPropagation(m_sample, 'integrator')
+            # bp.infer()
+            # marg = bp.marginals([0,1,2,3])
+            # print 'marg',marg
             exit()
 
         # exit()
@@ -342,7 +346,8 @@ def main(argv):
 
     # Train:
     # train(templated_data, hashed_feature_matrix)
-    # train(templated_data)
+    train(templated_data)
+    exit()
 
     # Train using the SGD:
     SGD(5, templated_data)
