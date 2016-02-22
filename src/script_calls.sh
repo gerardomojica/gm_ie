@@ -33,8 +33,20 @@ python -m models.chain_crf --train_file ../corpus/crf_suite_conll.txt
 # On a super small traning file, 2 sentences:
 python -m models.chain_crf --train_file ../corpus/dummy_train.txt
 
+# Stochastic Gradient Descent: /Users/luis/Dropbox/Luisn/PhD/Lab/Projects/gm_ie/src
+python -m models.chain_crf2 --train_file ../corpus/dummy_train.txt
+
+
 # ############################# 
 # ############################# 
 # ############################# Testing the creation of dynamic functions:
 
 python -m delete.dynamic_functions
+
+
+# ############################# 
+# ############################# 
+# ############################# Comming back on implementing the crf:
+
+python -m models.multi_softmax
+

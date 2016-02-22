@@ -2,6 +2,7 @@ The DT O
 dog NN I
 is VB O
 nuts JJ O
+nuts JJ B
 
 She NN I
 eats VB O
