@@ -50,3 +50,8 @@ python -m delete.dynamic_functions
 
 python -m models.multi_softmax
 
+# ############################# 
+# ############################# 
+# ############################# Reemplementing featurization, softmax with graphical models:
+cd /Users/luis/Dropbox/Luisn/PhD/Lab/Projects/gm_ie/src
+python -m models.logistic_regression_gm
